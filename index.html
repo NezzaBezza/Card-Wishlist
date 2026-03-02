@@ -1,32 +1,132 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sports Card Wishlist</title>
-    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f6f8;
+            padding: 40px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        input {
+            padding: 10px;
+            margin: 5px 0;
+            width: 48%;
+        }
+
+        button {
+            padding: 10px;
+            margin-top: 5px;
+            cursor: pointer;
+        }
+
+        .card-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            padding: 10px;
+            background: #f1f1f1;
+            border-radius: 5px;
+        }
+
+        .total {
+            margin-top: 20px;
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .delete-btn {
+            background: crimson;
+            color: white;
+            border: none;
+            padding: 5px 8px;
+            border-radius: 5px;
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>My Sports Card Wishlist</h1>
-    </header>
-    <main>
-        <section>
-            <h2>Wishlist</h2>
-            <ul>
-                <li>Card 1: Player Name - Year - Brand</li>
-                <li>Card 2: Player Name - Year - Brand</li>
-                <li>Card 3: Player Name - Year - Brand</li>
-                <!-- Add more cards as needed -->
-            </ul>
-        </section>
-        <section>
-            <h2>Notes</h2>
-            <p>Add any notes about your wishlist items here.</p>
-        </section>
-    </main>
-    <footer>
-        <p>Created on {{CURRENT_DATE}}</p>
-    </footer>
+
+<div class="container">
+    <h1>🏀 Sports Card Wishlist</h1>
+
+    <input type="text" id="cardName" placeholder="Card Name (e.g. 2018 Luka PSA 10)">
+    <input type="number" id="cardPrice" placeholder="Current Price ($)">
+    <button onclick="addCard()">Add Card</button>
+
+    <div id="wishlist"></div>
+
+    <div class="total" id="totalValue">Total Value: $0</div>
+</div>
+
+<script>
+    let wishlist = JSON.parse(localStorage.getItem("wishlist")) || [];
+
+    function saveToStorage() {
+        localStorage.setItem("wishlist", JSON.stringify(wishlist));
+    }
+
+    function addCard() {
+        const name = document.getElementById("cardName").value;
+        const price = parseFloat(document.getElementById("cardPrice").value);
+
+        if (!name || isNaN(price)) {
+            alert("Please enter a valid name and price.");
+            return;
+        }
+
+        wishlist.push({ name, price });
+        saveToStorage();
+        renderWishlist();
+
+        document.getElementById("cardName").value = "";
+        document.getElementById("cardPrice").value = "";
+    }
+
+    function deleteCard(index) {
+        wishlist.splice(index, 1);
+        saveToStorage();
+        renderWishlist();
+    }
+
+    function renderWishlist() {
+        const listDiv = document.getElementById("wishlist");
+        listDiv.innerHTML = "";
+
+        let total = 0;
+
+        wishlist.forEach((card, index) => {
+            total += card.price;
+
+            const div = document.createElement("div");
+            div.className = "card-item";
+            div.innerHTML = `
+                <span>${card.name} - $${card.price.toFixed(2)}</span>
+                <button class="delete-btn" onclick=\"deleteCard(${index})\">X</button>
+            `;
+            listDiv.appendChild(div);
+        });
+
+        document.getElementById("totalValue").innerText = 
+            "Total Value: $" + total.toFixed(2);
+    }
+
+    renderWishlist();
+</script>
+
 </body>
 </html>
